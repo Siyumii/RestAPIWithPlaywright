@@ -6,7 +6,7 @@ This project contains automated tests for the https://api.restful-api.dev API us
 - Add an object
 - Get a single object
 - Update the previously added object entirely.
-- Partially Update the previously added object. (Only update the name field, and keep the value field as it is)
+- Partially Update the previously added object. (Only update the name field, and keep the 'data' field as it is)
 - Delete an object
 
 ## Prerequisites

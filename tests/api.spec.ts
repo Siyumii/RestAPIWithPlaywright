@@ -71,17 +71,17 @@ test('Update product object using PUT', async ({ request }) => {
       },
       data: {
         name: 'Updated Playwright Product',
-        data: { key: 'value' }
+        data: { key: 'value added by PUT' }
       }
     }
   );
   expect(response.ok()).toBeTruthy();
   const body = await response.json();
   expect(body.name).toBe('Updated Playwright Product');
-  expect(body.data.key).toBe('value');
+  expect(body.data.key).toBe('value added by PUT');
 });
 
-//5. Update the object using PATCH. (partial update) //Only update the name field, and keep the value field as it is.
+//5. Update the object using PATCH. (partial update) //Only update the name field, and keep the 'data' field as it is.
 test('Update product object using PATCH', async ({ request }) => {
   test.skip(!createdProductId, 'No product created yet');
   const response = await request.patch(
@@ -99,7 +99,7 @@ test('Update product object using PATCH', async ({ request }) => {
   expect(response.ok()).toBeTruthy();
   const body = await response.json();
   expect(body.name).toBe('Updated Playwright Product Twice');
-  expect(body.data.key).toBe('value');
+  expect(body.data.key).toBe('value added by PUT'); //data field should remain unchanged
 });
 
 //6. Delete the object using DELETE.
