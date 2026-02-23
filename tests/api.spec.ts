@@ -82,7 +82,7 @@ test('Update product object using PUT', async ({ request }) => {
 });
 
 //5. Update the object using PATCH. (partial update) //Only update the name field, and keep the 'data' field as it is.
-test('Update product object using PATCH', async ({ request }) => {
+test('Partial Update product object using PATCH', async ({ request }) => {
   test.skip(!createdProductId, 'No product created yet');
   const response = await request.patch(
     `${BASE_URL}/collections/products/objects/${createdProductId}`,
