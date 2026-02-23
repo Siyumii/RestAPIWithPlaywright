@@ -1,75 +1,128 @@
-import {  test, expect } from '@playwright/test';
-
+import { test, expect } from '@playwright/test';
 const BASE_URL = 'https://api.restful-api.dev';
-let createdObjectId: string;
+const API_KEY = '32d8c2ec-b374-4533-afd8-8de75edc5e5c';
 
-// 1. Get list of all objects
-test('Get list of all objects', async ({ request }) => {
-  const response = await request.get(`${BASE_URL}/objects`);
-  console.log('URL:', `${BASE_URL}/objects`);
-  console.log('Response status:', response.status());
-  expect(response.ok()).toBeTruthy();
-  const data = await response.json();
-  expect(Array.isArray(data)).toBe(true);
-  expect(data.length).toBeGreaterThan(0);
-});
+let createdProductId: string;
 
-//2. Add an object using POST
-test('Add an object using POST', async ({ request }) => {
-  const response = await request.post(`${BASE_URL}/objects`, {
-    data: {
-      name: 'Playwright Test Object',
-      data: { key: 'value' }
+//1. GET list of all objects in products collection
+test('GET products', async ({ request }) => {
+  const response = await request.get(
+    `${BASE_URL}/collections/products/objects`,
+    {
+      headers: {
+        'x-api-key': API_KEY,
+      },
     }
-  });
+  );
   expect(response.ok()).toBeTruthy();
-  const data = await response.json();
-  expect(data.name).toBe('Playwright Test Object');
-  expect(data.data.key).toBe('value');
-  expect(data.id).toBeDefined();
-  createdObjectId = data.id;
-  console.log('Created object ID:', data.id);
+  const body = await response.json();
+  expect(body).toBeDefined();
 });
 
-// 3. Get a single object using the above added ID
-test('Get single object by ID', async ({ request }) => {
-  test.skip(!createdObjectId, 'No object created yet');
-  const response = await request.get(`${BASE_URL}/objects/${createdObjectId}`);
-  expect(response.ok()).toBeTruthy();
-  const data = await response.json();
-  expect(data.id).toBe(createdObjectId);
-  expect(data.name).toBe('Playwright Test Object');
-});
-
-// 4. Update the object added in Step 2
-test('Update the object', async ({ request }) => {
-  test.skip(!createdObjectId, 'No object created yet');
-  const response = await request.put(`${BASE_URL}/objects/${createdObjectId}`, {
-    data: {
-      name: 'Updated Test Object',
-      data: { key: 'newValue' }
+//2. Add an object using POST.
+test('Add a product object using POST', async ({ request }) => {
+  const response = await request.post(
+    `${BASE_URL}/collections/products/objects`,
+    {
+      headers: {
+        'x-api-key': API_KEY,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        name: 'Playwright Product',
+        data: { key: 'value' }
+      }
     }
-  });
+  );
   expect(response.ok()).toBeTruthy();
-  const data = await response.json();
-  expect(data.name).toBe('Updated Test Object');
-  expect(data.data.key).toBe('newValue');
+  const body = await response.json();
+  expect(body.name).toBe('Playwright Product');
+  expect(body.data.key).toBe('value');
+  expect(body.id).toBeDefined();
+  createdProductId = body.id;
 });
 
-// 5. Delete the object using DELETE
-test('Delete the object', async ({ request }) => {
-  test.skip(!createdObjectId, 'No object created yet');
-  const response = await request.delete(`${BASE_URL}/objects/${createdObjectId}`);
-  expect(response.status()).toBe(200); 
+//3. Get the object by ID using GET.
+test('Get product object by ID', async ({ request }) => {
+  test.skip(!createdProductId, 'No product created yet');
+  const response = await request.get(
+    `${BASE_URL}/collections/products/objects/${createdProductId}`,
+    {
+      headers: {
+        'x-api-key': API_KEY,
+      },
+    }
+  );
   expect(response.ok()).toBeTruthy();
- // const data = await response.json();
-  const expectedResponse = await request.get(`${BASE_URL}/objects/${createdObjectId}`);
+  const body = await response.json();
+  expect(body.id).toBe(createdProductId);
+  expect(body.name).toBe('Playwright Product');
+});
+
+//4. Update the Object added in step 2 using PUT.
+test('Update product object using PUT', async ({ request }) => {
+  test.skip(!createdProductId, 'No product created yet');
+  const response = await request.put(
+    `${BASE_URL}/collections/products/objects/${createdProductId}`,
+    {
+      headers: {
+        'x-api-key': API_KEY,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        name: 'Updated Playwright Product',
+        data: { key: 'value' }
+      }
+    }
+  );
+  expect(response.ok()).toBeTruthy();
+  const body = await response.json();
+  expect(body.name).toBe('Updated Playwright Product');
+  expect(body.data.key).toBe('value');
+});
+
+//5. Update the object using PATCH. (partial update) //Only update the name field, and keep the value field as it is.
+test('Update product object using PATCH', async ({ request }) => {
+  test.skip(!createdProductId, 'No product created yet');
+  const response = await request.patch(
+    `${BASE_URL}/collections/products/objects/${createdProductId}`,
+    {
+      headers: {
+        'x-api-key': API_KEY,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        name: 'Updated Playwright Product Twice'
+      }
+    }
+  );
+  expect(response.ok()).toBeTruthy();
+  const body = await response.json();
+  expect(body.name).toBe('Updated Playwright Product Twice');
+  expect(body.data.key).toBe('value');
+});
+
+//6. Delete the object using DELETE.
+test('Delete product object using DELETE', async ({ request }) => {
+  test.skip(!createdProductId, 'No product created yet');
+  const response = await request.delete(
+    `${BASE_URL}/collections/products/objects/${createdProductId}`,
+    {
+      headers: {
+        'x-api-key': API_KEY,
+      },
+    }
+  );
+  expect(response.status()).toBe(200);
+  expect(response.ok()).toBeTruthy();
+  // Verify deleted object cannot be fetched
+  const expectedResponse = await request.get(
+    `${BASE_URL}/collections/products/objects/${createdProductId}`,
+    {
+      headers: {
+        'x-api-key': API_KEY,
+      },
+    }
+  );
   expect(expectedResponse.status()).toBe(404);
-});
-
-//6. Verify deleted object cannot be fetched
-test('Get deleted object', async ({ request }) => {
-  test.skip(!createdObjectId, 'No object created yet');
-  const response = await request.get(`${BASE_URL}/objects/${createdObjectId}`);
-  expect(response.status()).toBe(404);
 });

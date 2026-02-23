@@ -5,9 +5,9 @@ This project contains automated tests for the https://api.restful-api.dev API us
 - Get all objects
 - Add an object
 - Get a single object
-- Update an object
+- Update the previously added object entirely.
+- Partially Update the previously added object. (Only update the name field, and keep the value field as it is)
 - Delete an object
-- Verify deleted object cannot be fetched
 
 ## Prerequisites
 - Node.js
